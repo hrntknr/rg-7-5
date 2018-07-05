@@ -25,20 +25,21 @@ router.post('/', async (req, res, next) => {
       }
     }
   })
-  const wikis = []
-  for (let keyword of result.data.keywords) {
-    try {
-      const wiki = await wikijs().page(keyword.text)
-      const summary = await wiki.summary()
-      console.log(summary)
-      wikis.push({
-        keyword: keyword.text,
-        summary: summary
-      })
-    } catch (error) {
-      //
-    }
-  }
+  const tasks = result.data.keywords.map((keyword) => {
+    return new Promise(async (resolve) => {
+      try {
+        const wiki = await wikijs().page(keyword.text)
+        const summary = await wiki.summary()
+        resolve({
+          keyword: keyword.text,
+          summary
+        })
+      } catch (e) {
+        resolve(null)
+      }
+    })
+  })
+  const wikis = (await Promise.all(tasks)).filter(a => a)
   res.json(wikis)
 })
 
