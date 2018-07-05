@@ -1,0 +1,27 @@
+extend layout
+block content
+  div
+    textarea#text(cols="30", rows="10").
+      I still have a dream. It is a dream deeply rooted in the American dream. I have a dream that one day this nation will rise up and live out the true meaning of its creed: "We hold these truths to be self-evident, that all men are created equal."
+  div
+    button(onclick="submit()") 検索
+  div#result
+  script.
+    function submit() {
+      console.log(document.getElementById('text').value)
+      axios.post('/',{text: document.getElementById('text').value})
+        .then((results)=>{
+          console.log(results)
+          const field = document.getElementById('result')
+          results.data.forEach((result)=>{
+            const wrap = document.createElement('div')
+            const title = document.createElement('h1')
+            title.innerHTML = result.keyword
+            const summary = document.createElement('div')
+            summary.innerHTML = result.summary
+            wrap.appendChild(title)
+            wrap.appendChild(summary)
+            field.appendChild(wrap)
+          })
+        })
+    }
